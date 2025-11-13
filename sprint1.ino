@@ -10,7 +10,6 @@ int low_moisture_threshold = 1500;
 int high_moisture_threshold = 3000;
 
 // Keeping a log of the manual watering time.
-
 void setup() {
   pinMode(relay_pin, OUTPUT);
   digitalWrite(relay_pin, HIGH);
@@ -27,14 +26,14 @@ void loop() {
 
   // if botton is pushed 
   if (current_button == LOW) { 
-    // Turn on the relay to water
+    // Turn on the relay to water and led
     digitalWrite(relay_pin, LOW);
     digitalWrite(led_pin, HIGH); 
     // keep checking if the button is being pressed
     while (digitalRead(button_pin) == LOW) {
       delay(10);
     }
-    // If not, turn it off
+    // If not, turn it off along with led
     digitalWrite(relay_pin, HIGH);
     digitalWrite(led_pin, LOW); 
     // Display 
@@ -57,7 +56,7 @@ void loop() {
     // Display
     Serial.print("Current moisture is ");
     Serial.println(current_moisture);
-    // delay 10 minutes
+    // delay 10 minutes later (60000) rn 1 second for debug
     delay(1000);
   }
 }
