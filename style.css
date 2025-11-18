@@ -7,3 +7,14 @@ body {
         color: #333;
         text-align: center;
     }
+button {
+    background: green;
+    color: white;
+    display: block;
+    cursor: pointer;
+    font-size: 16px;
+    width: 200px;
+    margin: 10px;
+    border: 1px black;
+    padding: 15px;
+}
