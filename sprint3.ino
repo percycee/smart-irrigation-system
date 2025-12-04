@@ -15,7 +15,9 @@ int high_moisture_threshold = 400;
 const char* ssid     = "T-Mobile Hotspot_5026_2.4GHz";
 const char* password = "55225026";
 
-WebServer server(80);
+IPAddress virtual_IP(127, 0, 0, 1);
+IPAddress local_IP(192, 168, 1, 184);
+WebServer server(virtual_IP, 8080);
 
 // Shared 10-second watering duration (button + app)
 const unsigned long WATER_DURATION_MS = 10UL * 1000UL;
@@ -24,8 +26,8 @@ bool buttonWatering = false;
 bool appWatering    = false;
 unsigned long waterEndTime = 0;
 
-// GET /status moisture = 0, isWatering = 1}
-void handleStatus() {
+// GET /status moisture = 0, isWatering = 1
+void handleStatus(WebServer& server) {
   int current_moisture = analogRead(moisture_pin);
   int relayState       = digitalRead(relay_pin); // LOW = ON, HIGH = OFF
   bool wateringNow     = (relayState == LOW);
@@ -38,7 +40,7 @@ void handleStatus() {
   server.send(200, "application/json", json);
 }
 
-void handleWaterStart() {
+void handleWaterStart(WebServer& server) {
   appWatering    = true;
   buttonWatering = false;
   waterEndTime   = millis() + WATER_DURATION_MS;
@@ -47,7 +49,7 @@ void handleWaterStart() {
   server.send(200, "text/plain", "ok");
 }
 
-void setup() {
+void setup(WebServer& server) {
   Serial.begin(9600);
   delay(500);
   Serial.println();
@@ -78,14 +80,14 @@ void setup() {
   Serial.print("ESP32 IP address: ");
   Serial.println(WiFi.localIP());
 
-  server.on("/status", HTTP_GET, handleStatus);
-  server.on("/water/start", HTTP_POST, handleWaterStart);
+  server.on("/moisture-data", HTTP_GET, handleStatus(server));
+  server.on("/manual-override", HTTP_POST, handleWaterStart(server));
 
   server.begin();
   Serial.println("HTTP server started.");
 }
 
-void loop() {
+void loop(WebServer& server) {
   server.handleClient();
 
   int current_moisture = analogRead(moisture_pin);

@@ -61,7 +61,7 @@ def app():
     context = {
             "log": json.dumps(log, indent=2)
         }
-    response = aiohttp_jinja2.render_template("index.html", request, context)
+    response = aiohttp_jinja2.render_template("user_interface.html", request, context)
     return response
 
   @routes.post('/manual-override')
@@ -86,7 +86,10 @@ def app():
   @routes.post('/moisture-data')
   async def moisture_data(request):
     data = await request.json()
+    moisture_value = data.get('moisture_value')
     sensor_value = data.get('sensor_value')
+    if moisture_value is None:
+      return web.Response(text="Moisture value is missing", status=400)
     if sensor_value is None:
       return web.Response(text="Sensor value is missing", status=400)
     add_log("sensor_data", f"Received sensor value: {sensor_value}")
@@ -96,7 +99,7 @@ def app():
   app = web.Application()
   app.add_routes(routes)
   aiohttp_jinja2.setup(app,
-                       loader=jinja2.FileSystemLoader('templates'))  
+                       loader=jinja2.FileSystemLoader('temp'))  
 
   return app
 
