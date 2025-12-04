@@ -1,8 +1,11 @@
+// PLEASE JUST GIVE UP
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <boost.hpp>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -15,6 +18,10 @@ typedef int ssize_t;
 #endif
 
 using namespace std;
+const int moisture_pin = 34;
+const int relay_pin = 32;
+const int button_pin = 26;
+const int led_pin = 27;
 
 // Function to initialize Winsock
 /* reference: 
@@ -40,6 +47,45 @@ void close(int client_socket) {
 #define init_winsock()
 #define cleanup_winsock()
 #endif
+
+boost::asio::io_service io;
+boost::asio::serial_port* arduino_port = nullptr;
+
+void init_serial(const string& port_name) {
+    arduino_port = new boost::asio::serial_port(io, port_name);
+    arduino_port->set_option(boost::asio::serial_port_base::baud_rate(9600));
+    arduino_port->set_option(boost::asio::serial_port_base::character_size(8));
+    arduino_port->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
+    arduino_port->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
+    arduino_port->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
+}
+
+void cleanup_serial() {
+    if (arduino_port) {
+        arduino_port->close();
+        delete arduino_port;
+    }
+}
+
+string read_from_arduino() {
+    if (arduino_port == nullptr) {
+        return "Error: No serial connection.";
+    }
+
+    boost::asio::streambuf buf;
+    boost::asio::read_until(*arduino_port, buf, "\n"); // Read until newline
+    istream input_stream(&buf);
+    string response;
+    getline(input_stream, response);
+    return response;
+}
+
+// Send data to Arduino
+void send_to_arduino(const string& data) {
+    if (arduino_port) {
+        boost::asio::write(*arduino_port, boost::asio::buffer(data + "\n"));
+    }
+}
 
 // read the contents of a file
 string read_file(const string& fileName) {
