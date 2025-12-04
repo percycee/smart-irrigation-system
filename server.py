@@ -100,6 +100,7 @@ def app():
   app.add_routes(routes)
   aiohttp_jinja2.setup(app,
                        loader=jinja2.FileSystemLoader('temp'))  
+  app.router.add_static('/static/', path=os.path.join(os.getcwd(), 'static'))
 
   return app
 
