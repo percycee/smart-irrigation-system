@@ -8,17 +8,17 @@ import aiohttp
 import aiohttp_jinja2
 from datetime import datetime
 
-LOG_FILE = 'logs.json'
-logs = []
+LOG_FILE = 'log.json'
+log = []
 
-def load_logs():
-  global logs
+def load_log():
+  global log
   if os.path.exists(LOG_FILE):
     with open(LOG_FILE, 'r') as f:
       try:
-        logs = json.load(f)  # Load the existing logs from the file
+        log = json.load(f)  
       except json.JSONDecodeError:
-        logs = []
+        log = []
 
 def append_log(log_entry):
     with open(LOG_FILE, 'a') as f:
@@ -31,7 +31,7 @@ def add_log(event_type: str, message: str):
         "event_type": event_type,
         "message": message
     }
-    logs.append(log_entry)
+    log.append(log_entry)
     append_log(log_entry)
 
 async def sse_handler(request):
@@ -44,8 +44,8 @@ async def sse_handler(request):
     
     try:
         while True:
-            if logs:
-                last_log = logs[-1]
+            if log:
+                last_log = log[-1]
                 # Send the last log entry as SSE
                 await response.write(f"data: {json.dumps(last_log)}\n\n".encode())
             await asyncio.sleep(1)  
@@ -59,7 +59,7 @@ def app():
   @routes.get('/')
   async def index(request):
     context = {
-            "logs": json.dumps(logs, indent=2)
+            "log": json.dumps(log, indent=2)
         }
     response = aiohttp_jinja2.render_template("index.html", request, context)
     return response
