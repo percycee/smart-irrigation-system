@@ -2,90 +2,88 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Smart Irrigation System (Demo)</title>
+  <title>Smart Irrigation System</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
   <div id="app">
-    <h1>Smart Irrigation System (Demo)</h1>
-
-    <div class="sections-row">
-      <!-- ZONE 1 -->
-      <div class="section">
-        <h2>Zone 1</h2>
-
-        <label>
-          Soil moisture:
-          <input id="moistureSlider-1" type="range" min="0" max="100" value="30">
-        </label>
-        <div class="small-note" id="moistureValue-1">Moisture: 30%</div>
-
-        <div style="margin-top:6px;">
-          <button id="startBtn-1">Start Watering (manual override)</button>
-          <button id="stopBtn-1">Stop Watering</button>
-        </div>
-
-        <div id="status-text-1">Watering is OFF</div>
-      </div>
-
-      <!-- ZONE 2 -->
-      <div class="section">
-        <h2>Zone 2</h2>
-
-        <label>
-          Soil moisture:
-          <input id="moistureSlider-2" type="range" min="0" max="100" value="30">
-        </label>
-        <div class="small-note" id="moistureValue-2">Moisture: 30%</div>
-
-        <div style="margin-top:6px;">
-          <button id="startBtn-2">Start Watering (manual override)</button>
-          <button id="stopBtn-2">Stop Watering</button>
-        </div>
-
-        <div id="status-text-2">Watering is OFF</div>
-      </div>
-
-      <!-- ZONE 3 -->
-      <div class="section">
-        <h2>Zone 3</h2>
-
-        <label>
-          Soil moisture:
-          <input id="moistureSlider-3" type="range" min="0" max="100" value="30">
-        </label>
-        <div class="small-note" id="moistureValue-3">Moisture: 30%</div>
-
-        <div style="margin-top:6px;">
-          <button id="startBtn-3">Start Watering (manual override)</button>
-          <button id="stopBtn-3">Stop Watering</button>
-        </div>
-
-        <div id="status-text-3">Watering is OFF</div>
-      </div>
-    </div>
-
-    <!-- Bottom row: log (left) + notes (right) -->
-    <div class="sections-row">
-      <div class="section">
-        <h2>Event log</h2>
-        <ul id="log-list" class="small-note"></ul>
-      </div>
-
-      <div class="section">
-        <h2>Moisture Thresholds (Science Notes)</h2>
-        <p class="small-note">
-          Our thresholds are based on calibration of standard Arduino soil moisture sensors.  
-          These sensors output raw values from 0-1023, where lower numbers mean wetter soil.  
-          Typical real-world readings: wet (200-400), healthy (400-700), dry (700+).  
-          We convert these into a 0-100% scale for the UI:
-          <br><br>
-          • Below 40% -> soil too dry -> auto watering ON<br>
-          • 40-80% -> healthy range -> watering OFF<br>
-          • Above 80% -> oversaturated -> watering blocked<br>
+    <header class="app-header">
+      <div>
+        <h1>Smart Irrigation System</h1>
+        <p class="subtitle">
+          Live demo of soil moisture, automatic watering, and manual override.
         </p>
       </div>
+      <div class="badge badge-demo">DEMO</div>
+    </header>
+
+    <div class="grid-row">
+      <!-- STATUS CARD -->
+      <section class="card">
+        <h2>Live Status</h2>
+
+        <div class="status-row">
+          <div class="status-block">
+            <div class="status-label">Moisture</div>
+            <div id="moistureValue" class="status-value">– %</div>
+            <div id="sensorValue" class="status-sub">Sensor: –</div>
+            <!-- NEW: classification line -->
+            <div id="moistureLabel" class="status-sub">Status: --</div>
+          </div>
+
+          <div class="status-block">
+            <div class="status-label">Watering</div>
+            <div id="status-text" class="status-chip status-off">
+              Watering is OFF
+            </div>
+          </div>
+        </div>
+
+        <div id="alert-box" class="alert-box" style="display:none;"></div>
+      </section>
+
+      <!-- CONTROLS CARD -->
+      <section class="card">
+        <h2>Controls</h2>
+        <p class="small-note">
+          The system waters automatically when soil is too dry.
+          You can still start watering manually (unless soil is oversaturated).
+        </p>
+
+        <div class="controls-row">
+          <button id="startBtn" class="btn primary">
+            Start Watering
+          </button>
+          <button id="stopBtn" class="btn">
+            Stop Watering
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid-row">
+      <!-- LOG CARD -->
+      <section class="card">
+        <h2>Event Log</h2>
+        <ul id="log-list" class="log-list small-note"></ul>
+      </section>
+
+      <!-- NOTES CARD -->
+      <section class="card">
+        <h2>Moisture Threshold Notes</h2>
+        <p class="small-note">
+          The soil-moisture sensor returns a raw value from 0–4095.  
+          We convert this to a 0–100% dryness value for the UI
+          (higher % = drier soil). Exact raw values depend on calibration,
+          so we use simple cutoff points for the demo:
+        </p>
+        <ul class="small-note">
+          <li><strong>Below 40%</strong> -> soil too dry -> auto watering <strong>ON</strong></li>
+          <li><strong>40-80%</strong> -> healthy range -> watering <strong>OFF</strong></li>
+          <li><strong>Above 80%</strong> -> oversaturated -> watering <strong>blocked</strong></li>
+        </ul>
+      </section>
     </div>
   </div>
 
